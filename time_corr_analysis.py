@@ -14,21 +14,20 @@ times = np.array(full_data[full_data.columns[0]].values)
 # Rounding all dt values to nearest 10
 rounded_down = list(set(np.floor(times / 10) * 10))
 times = sorted(rounded_down)
+times = [0.01, 0.5, 1.0, 2.5, 5.0, 7.5, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 70.0, 100.0]
 
 matrices = dict()
 
 def generate_matrix():
-    for i in range(len(times) - 1):
-        t_start = times[i]
-        t_end = times[i+1]
-        curr_df = full_data[(full_data['dt'] >= t_start) & (full_data['dt'] <= t_end)]
+    for time in times:
+        curr_df = full_data[full_data['dt'] == time]
         curr_df = curr_df.drop('dt', axis=1)
         curr_df = curr_df.drop('name', axis=1)
 
-        path = f'./out/time/corr_matrices/{int(t_start)}_{int(t_end)}.csv'
+        path = f'./out/time/corr_matrices/{time}_corr.csv'
         corr_curr_matrix = curr_df.corr('spearman')
 
-        matrices[str((t_start + t_end)/2)] = np.array(corr_curr_matrix)
+        matrices[time] = np.array(corr_curr_matrix)
 
         corr_curr_matrix.to_csv(path)
 
@@ -75,7 +74,3 @@ between 0 to 0.3
 
 There is a very high positive correlation between the different final score subgroups
 '''
-
-# Include how individual candidate's scores change through time
-# Try to determine which subscore is most influential for the final scores
-# Are the final scores too correlated so that the model is not discerning between them
